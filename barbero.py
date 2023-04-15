@@ -2,20 +2,15 @@ from queue import Queue
 from threading import Thread, Semaphore
 import threading
 import time
-import tkinter as tk
 
 class Barbero(Thread):
-    def __init__(self, cola, semaforo,interfaz, x, y):
+    def __init__(self,nombre, cola, semaforo):
         Thread.__init__(self)
         #una queue para los clientes
+        self.nombre = nombre
         self.cola = cola
         self.estado = "dormido"
         self.semaforo = semaforo
-        self.interfaz = interfaz
-        self.x = x
-        self.y = y
-        self.estado_label = tk.Label(self.interfaz, text= f"El barbero está {self.estado}", bg="#000000", fg="#ffffff")
-        self.estado_label.place(x=self.x, y=self.y)
 
     def run(self):
         while True:
@@ -26,8 +21,8 @@ class Barbero(Thread):
                     self.cola.get()
                     self.semaforo.release()
                     self.estado = "despierto"
-                    print("Cortando el pelo")
-                    time.sleep(3)
+                    print(f"{self.nombre} Cortando el pelo")
+                    time.sleep(5)
                     self.cola.task_done()
 
 class Cliente(Thread): 
@@ -39,26 +34,21 @@ class Cliente(Thread):
 
     def run(self):
         self.cola.put(1)
-        self.semaforo.adquire()
+        self.semaforo.acquire()
         print(f"{self.nombre} esperando")
-        time.sleep(5)
+        time.sleep(3)
 
 class Interfaz:
     def __init__(self):
-        
-        self.ventana = tk.Tk()
-        self.ventana.title("Barbero")
-        self.ventana.geometry("300x300")
-        self.ventana.resizable(False, False)
-        self.ventana.config(bg="#000000")
-        self.ventana.mainloop()
         threading.Thread(target=self.iniciar).start()
 
     def iniciar(self):
         cola = Queue()
         e = Semaphore(1)
-        barbero = Barbero(cola, e, self.ventana ,50, 50)
+        barbero = Barbero("barbero1", cola, e)
+        barbero2 = Barbero("barbero2", cola, e)
         barbero.start()
+        barbero2.start()
         n = 0
         while True:
             n +=1
