@@ -38,7 +38,7 @@ class Cliente(Thread):
         print(f"{self.nombre} esperando")
         time.sleep(3)
 
-class Interfaz:
+class Problema:
     def __init__(self):
         threading.Thread(target=self.iniciar).start()
 
@@ -58,4 +58,4 @@ class Interfaz:
 
 if __name__ == "__main__":
 
-    Interfaz()
+    Problema()
